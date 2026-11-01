@@ -145,10 +145,6 @@ function App() {
               <>
                 <h2>Prediction Result</h2>
 
-                <p className="prediction">
-                  {result.result}
-                </p>
-
                 <p>
                   Probability Married:{" "}
                   <strong>
@@ -162,6 +158,19 @@ function App() {
                     {(result.probability_not_married * 100).toFixed(2)}%
                   </strong>
                 </p>
+
+                <div
+                  className={`final-result ${
+                    result.prediction === 1 ? "married" : "not-married"
+                  }`}
+                >
+                  <h3>Final Verdict</h3>
+                  <p className="prediction-text">
+                    {result.prediction === 1
+                      ? "He/She will be married at 30."
+                      : "He/She will not be married at 30."}
+                  </p>
+                </div>
               </>
             )}
           </div>

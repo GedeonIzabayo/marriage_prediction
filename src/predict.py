@@ -52,12 +52,6 @@ def predict_marriage():
     probability = model.predict_proba(person_scaled)[0]
 
     print("\n==============================")
-
-    if prediction == 1:
-        print("Prediction: MARRIED at 30")
-    else:
-        print("Prediction: NOT MARRIED at 30")
-
     print(
         f"Probability of married: "
         f"{probability[1] * 100:.2f}%"
@@ -67,6 +61,14 @@ def predict_marriage():
         f"Probability of not married: "
         f"{probability[0] * 100:.2f}%"
     )
+
+    print("------------------------------")
+    if prediction == 1:
+        print("Final Verdict: He/She will be married at 30")
+    else:
+        print("Final Verdict: He/She will not be married at 30")
+
+    print("==============================")
 
 
 if __name__ == "__main__":
