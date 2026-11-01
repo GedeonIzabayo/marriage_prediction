@@ -128,7 +128,11 @@ function App() {
         setAuthForm({ username: data.user.username, email: "", password: "" });
       }
     } catch (err) {
-      setAuthError(err.message);
+      if (err.message && (err.message.includes("Failed to fetch") || err.name === "TypeError")) {
+        setAuthError("Could not reach FastAPI server (http://127.0.0.1:8000). Ensure the backend is running.");
+      } else {
+        setAuthError(err.message);
+      }
     } finally {
       setAuthLoading(false);
     }
