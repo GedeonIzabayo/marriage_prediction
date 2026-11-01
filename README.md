@@ -240,6 +240,7 @@ Employment stability (years): 6
 Education (years): 16
 Relationship duration (years): 7
 Number of children: 2
+Family responsibility (1=Yes, 0=No): 0
 ```
 
 The model then produces a prediction such as:
@@ -296,7 +297,7 @@ The project follows this workflow:
 
 ## 🧮 Features and Target
 
-The input matrix `X` contains six features:
+The input matrix `X` contains seven features:
 
 ```python
 X = df.drop("married_at_30", axis=1)
@@ -311,7 +312,14 @@ y = df["married_at_30"]
 Therefore:
 
 ```text
-X → 6 input features
+X → 7 input features:
+    1. Age
+    2. Monthly income (USD)
+    3. Employment stability (years)
+    4. Education (years)
+    5. Relationship duration (years)
+    6. Number of children
+    7. Family responsibility (caring for siblings / paying school fees)
 y → marriage prediction
 ```
 

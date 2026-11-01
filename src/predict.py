@@ -1,5 +1,5 @@
 import joblib
-import numpy as np
+import pandas as pd
 
 
 MODEL_PATH = "models/marriage_model.pkl"
@@ -31,16 +31,21 @@ def predict_marriage():
     children = float(
         input("Number of children: ")
     )
+    family_resp_raw = input(
+        "Family responsibility (e.g., caring for siblings / paying school fees) [1 for Yes, 0 for No]: "
+    ).strip()
+    family_responsibility = float(family_resp_raw if family_resp_raw in ["0", "1"] else 0)
 
-    # Create input array
-    person = np.array([[
-        age,
-        income,
-        employment,
-        education,
-        relationship,
-        children
-    ]])
+    # Create input DataFrame
+    person = pd.DataFrame([{
+        "age": age,
+        "monthly_income_usd": income,
+        "employment_stability_years": employment,
+        "education_years": education,
+        "relationship_years": relationship,
+        "children": children,
+        "family_responsibility": family_responsibility
+    }])
 
     # Scale input
     person_scaled = scaler.transform(person)

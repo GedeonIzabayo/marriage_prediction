@@ -8,7 +8,8 @@ function App() {
     employment_stability_years: "",
     education_years: "",
     relationship_years: "",
-    children: ""
+    children: "",
+    family_responsibility: "0"
   });
 
   const [result, setResult] = useState(null);
@@ -41,7 +42,8 @@ function App() {
           ),
           education_years: Number(formData.education_years),
           relationship_years: Number(formData.relationship_years),
-          children: Number(formData.children)
+          children: Number(formData.children),
+          family_responsibility: Number(formData.family_responsibility)
         })
       });
 
@@ -131,6 +133,17 @@ function App() {
             placeholder="Example: 0"
             required
           />
+
+          <label>Family Responsibility (e.g. caring for siblings / school fees)</label>
+          <select
+            name="family_responsibility"
+            value={formData.family_responsibility}
+            onChange={handleChange}
+            required
+          >
+            <option value="0">No (None or minor responsibility)</option>
+            <option value="1">Yes (Caring for siblings, paying school fees, etc.)</option>
+          </select>
 
           <button type="submit" disabled={loading}>
             {loading ? "Predicting..." : "Predict Marriage Status"}

@@ -37,6 +37,7 @@ class MarriagePredictionInput(BaseModel):
     education_years: float
     relationship_years: float
     children: float
+    family_responsibility: float = 0.0
 
 
 @app.get("/")
@@ -48,6 +49,11 @@ def home():
 
 @app.post("/predict")
 def predict(data: MarriagePredictionInput):
+    # Reload model if updated
+    saved = joblib.load(MODEL_PATH)
+    current_model = saved["model"]
+    current_scaler = saved["scaler"]
+
     # Create input DataFrame with feature names
     person = pd.DataFrame([{
         "age": data.age,
@@ -55,17 +61,18 @@ def predict(data: MarriagePredictionInput):
         "employment_stability_years": data.employment_stability_years,
         "education_years": data.education_years,
         "relationship_years": data.relationship_years,
-        "children": data.children
+        "children": data.children,
+        "family_responsibility": data.family_responsibility
     }])
 
     # Scale input
-    person_scaled = scaler.transform(person)
+    person_scaled = current_scaler.transform(person)
 
     # Make prediction
-    prediction = model.predict(person_scaled)[0]
+    prediction = current_model.predict(person_scaled)[0]
 
     # Get probabilities
-    probabilities = model.predict_proba(person_scaled)[0]
+    probabilities = current_model.predict_proba(person_scaled)[0]
 
     if prediction == 1:
         result = "Married at 30"
