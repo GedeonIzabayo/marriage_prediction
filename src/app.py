@@ -10,6 +10,7 @@ from src.database import (
     init_db,
     create_user,
     authenticate_user,
+    change_password,
     log_prediction,
     get_admin_dashboard_stats
 )
@@ -48,6 +49,12 @@ class RegisterRequest(BaseModel):
     username: str
     email: str
     password: str
+
+
+class ChangePasswordRequest(BaseModel):
+    username: str
+    old_password: str
+    new_password: str
 
 
 class MarriagePredictionInput(BaseModel):
@@ -119,6 +126,22 @@ def register(data: RegisterRequest):
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Username or email is already registered."
         )
+
+
+@app.post("/auth/change-password")
+def change_pwd(data: ChangePasswordRequest):
+    if len(data.new_password) < 4:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="New password must be at least 4 characters long."
+        )
+    success, msg = change_password(data.username, data.old_password, data.new_password)
+    if not success:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=msg
+        )
+    return {"success": True, "message": msg}
 
 
 @app.get("/admin/dashboard")

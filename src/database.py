@@ -187,3 +187,41 @@ def get_admin_dashboard_stats():
         }
     finally:
         conn.close()
+
+
+def change_password(username: str, old_password: str, new_password: str):
+    conn = get_db()
+    cursor = conn.cursor()
+    try:
+        cursor.execute("SELECT id, password_hash FROM users WHERE username = ?", (username.strip(),))
+        user = cursor.fetchone()
+        if not user:
+            return False, "User not found."
+
+        if user["password_hash"] != hash_password(old_password):
+            return False, "Current password is incorrect."
+
+        new_hash = hash_password(new_password)
+        cursor.execute("UPDATE users SET password_hash = ? WHERE username = ?", (new_hash, username.strip()))
+        conn.commit()
+        return True, "Password changed successfully!"
+    finally:
+        conn.close()
+
+
+def reset_password_cli(username: str, new_password: str):
+    conn = get_db()
+    cursor = conn.cursor()
+    try:
+        cursor.execute("SELECT id FROM users WHERE username = ?", (username.strip(),))
+        user = cursor.fetchone()
+        if not user:
+            return False
+        new_hash = hash_password(new_password)
+        cursor.execute("UPDATE users SET password_hash = ? WHERE username = ?", (new_hash, username.strip()))
+        conn.commit()
+        return True
+    finally:
+        conn.close()
+
+

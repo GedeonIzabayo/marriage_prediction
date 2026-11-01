@@ -19,6 +19,17 @@ function App() {
   const [authSuccess, setAuthSuccess] = useState("");
   const [authLoading, setAuthLoading] = useState(false);
 
+  // Password Change State
+  const [showPwModal, setShowPwModal] = useState(false);
+  const [pwForm, setPwForm] = useState({
+    oldPassword: "",
+    newPassword: "",
+    confirmPassword: ""
+  });
+  const [pwError, setPwError] = useState("");
+  const [pwSuccess, setPwSuccess] = useState("");
+  const [pwLoading, setPwLoading] = useState(false);
+
   // Prediction Form State
   const [formData, setFormData] = useState({
     age: "",
@@ -136,6 +147,59 @@ function App() {
     localStorage.removeItem("user");
     setResult(null);
     setActiveTab("predict");
+    setShowPwModal(false);
+  };
+
+  // Password Change Handler
+  const handlePwChange = (e) => {
+    setPwForm({
+      ...pwForm,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  const handlePwSubmit = async (e) => {
+    e.preventDefault();
+    setPwError("");
+    setPwSuccess("");
+
+    if (pwForm.newPassword !== pwForm.confirmPassword) {
+      setPwError("New passwords do not match.");
+      return;
+    }
+    if (pwForm.newPassword.length < 4) {
+      setPwError("New password must be at least 4 characters long.");
+      return;
+    }
+
+    setPwLoading(true);
+    try {
+      const res = await fetch(`${API_BASE}/auth/change-password`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          username: currentUser.username,
+          old_password: pwForm.oldPassword,
+          new_password: pwForm.newPassword
+        })
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.detail || "Failed to change password");
+      }
+
+      setPwSuccess("Password changed successfully!");
+      setPwForm({ oldPassword: "", newPassword: "", confirmPassword: "" });
+      setTimeout(() => {
+        setShowPwModal(false);
+        setPwSuccess("");
+      }, 1600);
+    } catch (err) {
+      setPwError(err.message);
+    } finally {
+      setPwLoading(false);
+    }
   };
 
   // Prediction Handlers
@@ -231,16 +295,96 @@ function App() {
             </button>
 
             {currentUser && (
-              <button
-                type="button"
-                className="logout-btn"
-                onClick={handleLogout}
-              >
-                Log Out
-              </button>
+              <>
+                <button
+                  type="button"
+                  className="pw-toggle-btn"
+                  onClick={() => {
+                    setShowPwModal(!showPwModal);
+                    setPwError("");
+                    setPwSuccess("");
+                  }}
+                  title="Change Password"
+                >
+                  🔑 Password
+                </button>
+                <button
+                  type="button"
+                  className="logout-btn"
+                  onClick={handleLogout}
+                >
+                  Log Out
+                </button>
+              </>
             )}
           </div>
         </div>
+
+        {/* Change Password Modal */}
+        {showPwModal && (
+          <div className="pw-modal-overlay">
+            <div className="pw-modal-card">
+              <div className="pw-modal-header">
+                <h3>🔑 Change Password</h3>
+                <button
+                  type="button"
+                  className="modal-close-btn"
+                  onClick={() => setShowPwModal(false)}
+                >
+                  ✕
+                </button>
+              </div>
+
+              {pwError && <div className="alert error-alert">{pwError}</div>}
+              {pwSuccess && <div className="alert success-alert">{pwSuccess}</div>}
+
+              <form onSubmit={handlePwSubmit}>
+                <label>Current Password</label>
+                <input
+                  type="password"
+                  name="oldPassword"
+                  value={pwForm.oldPassword}
+                  onChange={handlePwChange}
+                  placeholder="Enter current password"
+                  required
+                />
+
+                <label>New Password</label>
+                <input
+                  type="password"
+                  name="newPassword"
+                  value={pwForm.newPassword}
+                  onChange={handlePwChange}
+                  placeholder="At least 4 characters"
+                  required
+                />
+
+                <label>Confirm New Password</label>
+                <input
+                  type="password"
+                  name="confirmPassword"
+                  value={pwForm.confirmPassword}
+                  onChange={handlePwChange}
+                  placeholder="Re-enter new password"
+                  required
+                />
+
+                <div className="modal-actions">
+                  <button
+                    type="button"
+                    className="cancel-btn"
+                    onClick={() => setShowPwModal(false)}
+                  >
+                    Cancel
+                  </button>
+                  <button type="submit" disabled={pwLoading}>
+                    {pwLoading ? "Updating..." : "Update Password"}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
 
         {/* View Switcher for Admin */}
         {currentUser && currentUser.role === "admin" && (
