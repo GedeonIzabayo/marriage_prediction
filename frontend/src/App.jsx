@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./App.css";
 
 function App() {
+  const [theme, setTheme] = useState("light");
   const [formData, setFormData] = useState({
     age: "",
     monthly_income_usd: "",
@@ -14,6 +15,23 @@ function App() {
 
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const savedTheme = localStorage.getItem("theme");
+    if (savedTheme === "dark" || savedTheme === "light") {
+      setTheme(savedTheme);
+      document.body.style.backgroundColor =
+        savedTheme === "dark" ? "#121212" : "#f0f2f5";
+    }
+  }, []);
+
+  const toggleTheme = () => {
+    const nextTheme = theme === "light" ? "dark" : "light";
+    setTheme(nextTheme);
+    localStorage.setItem("theme", nextTheme);
+    document.body.style.backgroundColor =
+      nextTheme === "dark" ? "#121212" : "#f0f2f5";
+  };
 
   const handleChange = (e) => {
     setFormData({
@@ -65,8 +83,17 @@ function App() {
   };
 
   return (
-    <div className="container">
+    <div className={`container ${theme}`}>
       <div className="card">
+        <div className="card-top-bar">
+          <button
+            type="button"
+            className="theme-toggle-btn"
+            onClick={toggleTheme}
+          >
+            {theme === "light" ? "🌙 Dark Mode" : "☀️ Light Mode"}
+          </button>
+        </div>
         <h1>Marriage Prediction</h1>
 
         <p className="description">
