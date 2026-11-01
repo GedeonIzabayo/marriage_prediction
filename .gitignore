@@ -11,6 +11,10 @@ __pycache__/
 *.so
 .pytest_cache/
 
+# Databases
+*.db
+*.sqlite3
+
 # Node / Frontend
 frontend/node_modules/
 frontend/dist/
@@ -23,4 +27,3 @@ npm-debug.log*
 .idea/
 .DS_Store
 Thumbs.db
-
